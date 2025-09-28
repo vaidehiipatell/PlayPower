@@ -1,7 +1,7 @@
 import serverless from 'serverless-http'
 import dotenv from 'dotenv'
-import { connectDB } from '../../server/src/config/db.js'
-import { buildApp } from '../../server/src/server.js'
+import { connectDB } from '../../src/config/db.js'
+import { buildApp } from '../../src/server.js'
 
 dotenv.config()
 
