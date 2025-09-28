@@ -1,0 +1,12 @@
+{
+  "name": "ai-quizzer-monorepo",
+  "private": true,
+  "workspaces": ["server", "client"],
+  "scripts": {
+    "build:client": "npm run -w client build",
+    "dev:client": "npm run -w client dev"
+  },
+  "dependencies": {
+    "serverless-http": "^3.2.0"
+  }
+}

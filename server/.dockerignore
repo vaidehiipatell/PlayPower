@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+.git
+.env
+coverage
+Dockerfile
+README.md
+postman_collection.json

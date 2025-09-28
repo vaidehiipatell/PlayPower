@@ -1,0 +1,92 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI Quizzer API",
+    "version": "1.0.0",
+    "description": "Authentication, quiz generation/evaluation, hints, history, and leaderboard."
+  },
+  "servers": [
+    { "url": "http://localhost:8080" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  },
+  "security": [ { "bearerAuth": [] } ],
+  "paths": {
+    "/health": {
+      "get": { "summary": "Health check", "responses": { "200": { "description": "OK" } } }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Mock login to get a JWT",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "username": {"type": "string"}, "password": {"type": "string"}, "email": {"type": "string"} }, "required": ["username", "password"] } } } },
+        "responses": { "200": { "description": "JWT token" }, "400": { "description": "Bad request" } }
+      }
+    },
+    "/quizzes/generate": {
+      "post": {
+        "summary": "Generate a new quiz (AI-assisted with adaptive difficulty)",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "subject": {"type": "string"}, "grade": {"type": "string"}, "title": {"type": "string"}, "counts": {"type": "object"} }, "required": ["subject", "grade"] } } } },
+        "responses": { "201": { "description": "Created" }, "401": { "description": "Unauthorized" } },
+        "security": [ { "bearerAuth": [] } ]
+      }
+    },
+    "/quizzes/{quizId}/submit": {
+      "post": {
+        "summary": "Submit answers and get evaluated score",
+        "parameters": [ { "name": "quizId", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "answers": {"type": "array", "items": {"type": "object", "properties": {"questionIndex": {"type": "integer"}, "answer": {"type": "string"} }, "required": ["questionIndex", "answer"] } } }, "required": ["answers"] } } } },
+        "responses": { "201": { "description": "Created" }, "401": { "description": "Unauthorized" } },
+        "security": [ { "bearerAuth": [] } ]
+      }
+    },
+    "/quizzes/{quizId}/retry": {
+      "post": {
+        "summary": "Retry a quiz (creates a new submission attempt)",
+        "parameters": [ { "name": "quizId", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "201": { "description": "Created" }, "401": { "description": "Unauthorized" } },
+        "security": [ { "bearerAuth": [] } ]
+      }
+    },
+    "/quizzes/{quizId}/hint/{questionIndex}": {
+      "get": {
+        "summary": "Get AI-generated hint for a question",
+        "parameters": [
+          { "name": "quizId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "questionIndex", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "404": { "description": "Not found" } },
+        "security": [ { "bearerAuth": [] } ]
+      }
+    },
+    "/quizzes/history": {
+      "get": {
+        "summary": "Get quiz history with filters and date range",
+        "parameters": [
+          { "name": "subject", "in": "query", "schema": {"type": "string"} },
+          { "name": "grade", "in": "query", "schema": {"type": "string"} },
+          { "name": "minScore", "in": "query", "schema": {"type": "number"} },
+          { "name": "maxScore", "in": "query", "schema": {"type": "number"} },
+          { "name": "from", "in": "query", "schema": {"type": "string"}, "description": "ISO date or YYYY-MM-DD" },
+          { "name": "to", "in": "query", "schema": {"type": "string"}, "description": "ISO date or YYYY-MM-DD" }
+        ],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } },
+        "security": [ { "bearerAuth": [] } ]
+      }
+    },
+    "/quizzes/leaderboard": {
+      "get": {
+        "summary": "Leaderboard of top scores",
+        "parameters": [
+          { "name": "subject", "in": "query", "schema": {"type": "string"} },
+          { "name": "grade", "in": "query", "schema": {"type": "string"} },
+          { "name": "limit", "in": "query", "schema": {"type": "integer", "default": 10} }
+        ],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } },
+        "security": [ { "bearerAuth": [] } ]
+      }
+    }
+  }
+}
